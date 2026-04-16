@@ -1,8 +1,19 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+
+function hasWebGL(): boolean {
+  try {
+    const canvas = document.createElement("canvas");
+    const gl =
+      canvas.getContext("webgl2") || canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+    return !!gl;
+  } catch {
+    return false;
+  }
+}
 
 function Particles({ count = 1500 }: { count?: number }) {
   const mesh = useRef<THREE.Points>(null);
@@ -110,7 +121,41 @@ function FloatingGeometry() {
   );
 }
 
+/** CSS-only fallback when WebGL is unavailable */
+function CSSParticles() {
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      {Array.from({ length: 40 }).map((_, i) => (
+        <div
+          key={i}
+          className="absolute rounded-full bg-indigo-500/30 animate-pulse"
+          style={{
+            width: `${2 + Math.random() * 4}px`,
+            height: `${2 + Math.random() * 4}px`,
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 5}s`,
+            animationDuration: `${3 + Math.random() * 4}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export default function ParticleField() {
+  const [webglAvailable, setWebglAvailable] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setWebglAvailable(hasWebGL());
+  }, []);
+
+  // Still loading the check
+  if (webglAvailable === null) return null;
+
+  // No WebGL — use CSS fallback
+  if (!webglAvailable) return <CSSParticles />;
+
   return (
     <div className="absolute inset-0 pointer-events-none">
       <Canvas

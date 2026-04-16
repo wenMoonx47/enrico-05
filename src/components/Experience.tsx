@@ -70,6 +70,7 @@ function ProductScreenshot({
                 src={branding.image}
                 alt={`${company} product screenshot`}
                 loading="lazy"
+                suppressHydrationWarning
                 className="w-full h-auto transition-transform duration-500 group-hover:scale-105"
               />
             </div>
@@ -102,6 +103,7 @@ function ProductScreenshot({
           src={branding.image}
           alt={`${company} product screenshot`}
           loading="lazy"
+          suppressHydrationWarning
           className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
         />
         {/* Overlay with description on hover */}
